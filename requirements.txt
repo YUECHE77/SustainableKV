@@ -1,0 +1,15 @@
+numpy==1.24.4
+packaging
+ninja
+
+transformers==4.37.0
+huggingface_hub==0.22.2
+datasets==2.14.6
+
+jieba
+fuzzywuzzy
+rouge
+rouge_score
+
+matplotlib
+seaborn

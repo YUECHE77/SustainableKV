@@ -9,9 +9,9 @@ MODEL="longchat-v1.5-7b-32k"
 COMPRESS_ARGS="c4096_w32_sl9216_sink4_re10_k7_maxpool_pivot.json"  # SustainableKV
 
 datasets=(
-  # "narrativeqa"
-  # "qasper"
-  # "multifieldqa_en"
+  "narrativeqa"
+  "qasper"
+  "multifieldqa_en"
   "hotpotqa"
   "2wikimqa"
   "musique"

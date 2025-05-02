@@ -1,89 +1,74 @@
-# SnapKV :camera:
-We introduce an innovative and out-of-box KV cache compression method, [SnapKV](https://arxiv.org/abs/2404.14469).
-## Requirements
-Currently tested with `transformers==4.37.0`, need to check if it is compatible with higher version.
+# EE641 Final Project Group 2
+We proposed two KV cache eviction algorithm, SustainableKV and HybridKV.
+## 🛠️ Environment Setup
 ```
-transformers>=4.36
-flash-attn==2.4.0
-```
-## Installation
-```
-git clone git@github.com:FasterDecoding/SnapKV.git
-cd SnapKV
+conda create --name sustainablekv python=3.11
+conda activate sustainablekv
+
+git clone https://github.com/YUECHE77/EE641_Final_Project.git
+cd EE641_Final_Project
 pip install -e .
+pip install -r requirements.txt
 ```
+⚠️ We recommend manually installing PyTorch and FlashAttention to avoid version conflicts.
 
-### My suggestion:
+1. Install PyTorch (CUDA 11.8):
 
-```
-git clone git@github.com:FasterDecoding/SnapKV.git
-cd SnapKV
+    ```
+    pip uninstall torch torchvision torchaudio -y
+    pip install torch==2.3.0 torchvision==0.18.0 torchaudio==2.3.0 --index-url https://download.pytorch.org/whl/cu118
+    ```
 
-conda create --name snapkv python=3.11
-conda activate snapkv
-pip install -e .
+2. Install FlashAttention:
+    
+    FlashAttention is sensitive to version mismatches. You can find all official wheels here:
+    https://github.com/Dao-AILab/flash-attention/releases?page=1
+    
+    A configuration that guaranteed to work:
+    cuda11.8, python3.11, pytorch==2.3.0, flash_attn==2.5.8
+    
+    Check your ABI setting:
+    ```
+    python -c "import torch; print(torch._C._GLIBCXX_USE_CXX11_ABI)"  # Just to check to use abiFALSE or abiTRUE
+    ```
+    Then install the correct wheel:
+    ```
+    pip install https://github.com/Dao-AILab/flash-attention/releases/download/v2.5.8/flash_attn-2.5.8+cu118torch2.3cxx11abiFALSE-cp311-cp311-linux_x86_64.whl
+    ```
 
-pip uninstall transformers
-pip install transformers==4.37.0  # you can also try 4.38.2
+## 🔥Quick Start
+1. Download the models from HuggingFace (please refer to [model](./experiments/LongBench/config/model2path.json)). Currently, we support Mistral / Mixtral / LLaMA Family. Then replace your model path [here](./experiments/LongBench/config/model2path.json).
+2. We prepare a [demo](./notebooks/example.py). You can modify the [`method`](./notebooks/example.py#L19), [`model_to_use`](./notebooks/example.py#L25), and [`model2path`](./notebooks/example.py#L35) to test our methods. Please also modify the path to the SnapKV's paper in line 54, which is the input document.
 
-pip install packaging
-pip install ninja
+## 💯Key Implementations
+The detailed algorithm of SustainableKV is in [`sustainablekv_utils.py`](./SustainableKV/sustainablekv_utils.py)
 
-pip uninstall numpy
-pip install numpy==1.24.4
+The detailed algorithm of HybridKV is in [`hybridkv_utils.py`](./Hybridkv/hybridkv_utils.py)
 
-pip uninstall torch torchvision torchaudio -y
-pip install torch==2.3.0 torchvision==0.18.0 torchaudio==2.3.0 --index-url https://download.pytorch.org/whl/cu118
+You can easily integrate SustainableKV and HybridKV with other models. Use SustainableKV as an example, just follow the same pattern as those [existing models](./SustainableKV/monkeypatch.py). Currently, we support [Llama family](./SustainableKV/llama_hijack.py)/ [Mistral](./SustainableKV/mistral_hijack.py)/ [Mixtral](./SustainableKV/mixtral_hijack.py)
 
-python -c "import torch; print(torch._C._GLIBCXX_USE_CXX11_ABI)"  # Just to check to use abiFALSE or abiTRUE
-pip install https://github.com/Dao-AILab/flash-attention/releases/download/v2.5.8/flash_attn-2.5.8+cu118torch2.3cxx11abiFALSE-cp311-cp311-linux_x86_64.whl
+## 🧪Reproduce the Experiments results
 
-pip install huggingface_hub==0.22.2 datasets==2.14.6
-pip install jieba fuzzywuzzy rouge rouge_score
-```
+1. LongBench:
+    ```
+    cd experiments/LongBench
+    bash longbench.sh
+    ```
+2. Needle In A Haystack:
+    ```
+    cd experiments/NeedleInHaystack
+    python pred_sustainable.py \
+        --model-name lwm-text-chat-1m \
+        -s 1000 \
+        -e 30000 \
+        --num-intervals 15 \
+        --compress \
+        --save-folder /the/folder/path
+    ```
 
-### Yue: About the version for flash-attn
-flash-attn is a very "vulnerable" package. It can easily conflict with "incorrect" versions of other packages. The following link contains all the versions:
+## ✨Partial Results
+![Comprehensive Experiment Results on LongBench](./assets/longbench_sustainablekv.png)
+![Retrieval Test Result on Needle-in-a-Haystack](./assets/LWM-retrieval-test-sustainableKV.png)
 
-https://github.com/Dao-AILab/flash-attention/releases?page=1
-
-The configuration that finally works (refer to https://github.com/Dao-AILab/flash-attention/issues/966 use Ctrl+F for bighuang624's answer):
-cuda11.8, python3.11, pytorch==2.3.0, flash_attn==2.5.8
-
-## Quick Start
-### Use SnapKV-optimized Models
-For example: 
-```python
-from snapkv.monkeypatch.monkeypatch import replace_mistral
-replace_mistral() # Use monkey patches enable SnapKV
-```
-
-Check [the example notebook](./notebooks/example.ipynb).
-
-### Customize Your SnapKV-optimized Models
-SnapKV can be easily integrated with other models. 
-
-You can follow the comment marked with `[SnapKV]` in [existing models](./snapkv/monkeypatch/monkeypatch.py) to construct your own models. (Currently we support [Llama family](./snapkv/monkeypatch/llama_hijack_4_37.py)/ [Mistral](./snapkv/monkeypatch//mistral_hijack_4_37.py)/ [Mixtral](./snapkv/monkeypatch//mixtral_hijack_4_37.py)) 
-
-The detailed algorithm of SnapKV is in [`snapkv_utils.py`](./snapkv/monkeypatch/snapkv_utils.py)
-
-
-## Partial Results
-![Comprehensive Experiment Results on LongBench](./assets/longbench.jpg)
-![Pressure Test Result on Needle-in-a-Haystack](./assets/LWM-Text-Chat-1M_SnapKV.jpg)
-
-## TODO
-- [ ] Add observation experiments for reduplication.
-- [ ] Add LongBench for reduplication.
-- [ ] Explore the prompt phase compression.
-
-## Citation
-If you feel this project is helpful, please consider cite our report :blush:
-```
-@article{li2024snapkv,
-  title={SnapKV: LLM Knows What You are Looking for Before Generation},
-  author={Li, Yuhong and Huang, Yingbing and Yang, Bowen and Venkitesh, Bharat and Locatelli, Acyr and Ye, Hanchen and Cai, Tianle and Lewis, Patrick and Chen, Deming},
-  journal={arXiv preprint arXiv:2404.14469},
-  year={2024}
-}
-```
+## Acknowledgement
+Many thanks to [SnapKV](https://github.com/FasterDecoding/SnapKV) for their great work!!!
