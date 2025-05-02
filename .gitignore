@@ -160,6 +160,7 @@ cython_debug/
 #.idea/
 notebooks/test*
 experiments/LongBench/pred*
+!experiments/LongBench/pred*.py
 experiments/LongBench/SustainableKV_pred*
 experiments/NeedleInHaystack/snapkv_results_needle*
 experiments/NeedleInHaystack/sustainablekv_results_needle*

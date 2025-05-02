@@ -13,7 +13,6 @@ cd SnapKV
 pip install -e .
 ```
 
-
 ### My suggestion:
 
 ```
