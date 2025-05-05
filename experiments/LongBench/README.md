@@ -3,12 +3,12 @@ This is a VERY minimal implementation (with slightly modification) of LongBench.
 
 You should be able to reproduce the results shown on our report.
 
-Hardware: 1 * A100-80GB (2 for `Mixtral`)
+Hardware: 1 * A800-80GB
 
 example:
 
 ```
-bash scripts/run_longbench.py
+bash longbench.sh
 ```
 
 # Citation
