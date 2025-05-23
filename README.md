@@ -1,4 +1,4 @@
-# EE641 Final Project Group 2
+# SustainableKV & HybridKV ✂️
 We proposed two KV cache eviction algorithm, SustainableKV and HybridKV.
 ## 🛠️ Environment Setup
 ```
