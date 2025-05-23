@@ -1,5 +1,5 @@
-# SustainableKV & HybridKV ✂️
-We proposed two KV cache eviction algorithm, SustainableKV and HybridKV.
+# ✂️ SustainableKV & HybridKV 
+We proposed two KV cache eviction algorithm, SustainableKV and HybridKV. We guarantee that all experiment results are reproducible.
 ## 🛠️ Environment Setup
 ```
 conda create --name sustainablekv python=3.11
