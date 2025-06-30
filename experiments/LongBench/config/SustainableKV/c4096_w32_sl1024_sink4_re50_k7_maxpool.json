@@ -1,0 +1,1 @@
+{"window_sizes": 32, "subseq_len": 1024, "attn_sink_tok": 4, "desired_cache_size": 4096, "kernel_sizes": 7, "pooling": "maxpool", "recycling_percent": 0.5}
