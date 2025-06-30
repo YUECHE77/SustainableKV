@@ -1,5 +1,5 @@
 # ✂️ SustainableKV
-This repo is the official implementation of the KV cache eviction algorithm -- SustainableKV. We guarantee all experiment results are reproducible.
+This repo is the official implementation of the KV cache eviction algorithm --- SustainableKV. We guarantee all experiment results are reproducible.
 ## 🛠️ Environment Setup
 ```
 conda create --name sustainablekv python=3.11
